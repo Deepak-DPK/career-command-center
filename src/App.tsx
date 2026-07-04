@@ -44,37 +44,49 @@ export default function App() {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [darkMode, setDarkMode] = useState(true);
 
-  // Local state persistence: Load previous generation & user session on mount
   useEffect(() => {
-    // Theme setup
+  async function restoreSession() {
     const isDark = localStorage.getItem("theme") !== "light";
     setDarkMode(isDark);
 
-    // Load persisted prep kit
     const storedKit = localStorage.getItem("ccc_latest_kit");
     const storedJob = localStorage.getItem("ccc_latest_job");
+
     if (storedKit) {
       try {
         setPrepKit(JSON.parse(storedKit));
       } catch (e) {
-        console.error("Failed to parse cached prep kit:", e);
+        console.error(e);
+        localStorage.removeItem("ccc_latest_kit");
       }
     }
+
     if (storedJob) {
       setJobDescription(storedJob);
     }
 
-    // Load cached sandbox session if available
+    try {
+      const firebaseUser = await getPersistedUser();
+      if (firebaseUser) {
+        setUser(firebaseUser);
+        return;
+      }
+    } catch (err) {
+      console.error("Firebase restore failed:", err);
+    }
+
     const cachedUser = localStorage.getItem("ccc_sandbox_user");
     if (cachedUser) {
       try {
         setUser(JSON.parse(cachedUser));
       } catch (e) {
-        console.error("Failed to parse cached user:", e);
+        localStorage.removeItem("ccc_sandbox_user");
       }
     }
-  }, []);
+  }
 
+  restoreSession();
+}, []);
   // Update HTML class when dark mode changes
   useEffect(() => {
     const root = window.document.documentElement;
