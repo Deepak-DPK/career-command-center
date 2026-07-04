@@ -23,12 +23,7 @@ import ResultsTabs from "./components/ResultsTabs";
 import LoadingOverlay from "./components/LoadingOverlay";
 import ErrorToast from "./components/ErrorToast";
 
-import {
-  signInWithGoogle,
-  signOutUser,
-  isRealFirebase,
-  getPersistedUser
-} from "./firebase/config";
+import { signInWithGoogle, signOutUser, isRealFirebase } from "./firebase/config";
 import { generatePrepKit } from "./services/api";
 import { SAMPLE_JOBS } from "./data/samples";
 
@@ -49,49 +44,37 @@ export default function App() {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [darkMode, setDarkMode] = useState(true);
 
+  // Local state persistence: Load previous generation & user session on mount
   useEffect(() => {
-  async function restoreSession() {
+    // Theme setup
     const isDark = localStorage.getItem("theme") !== "light";
     setDarkMode(isDark);
 
+    // Load persisted prep kit
     const storedKit = localStorage.getItem("ccc_latest_kit");
     const storedJob = localStorage.getItem("ccc_latest_job");
-
     if (storedKit) {
       try {
         setPrepKit(JSON.parse(storedKit));
       } catch (e) {
-        console.error(e);
-        localStorage.removeItem("ccc_latest_kit");
+        console.error("Failed to parse cached prep kit:", e);
       }
     }
-
     if (storedJob) {
       setJobDescription(storedJob);
     }
 
-    try {
-      const firebaseUser = await getPersistedUser();
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        return;
-      }
-    } catch (err) {
-      console.error("Firebase restore failed:", err);
-    }
-
+    // Load cached sandbox session if available
     const cachedUser = localStorage.getItem("ccc_sandbox_user");
     if (cachedUser) {
       try {
         setUser(JSON.parse(cachedUser));
       } catch (e) {
-        localStorage.removeItem("ccc_sandbox_user");
+        console.error("Failed to parse cached user:", e);
       }
     }
-  }
+  }, []);
 
-  restoreSession();
-}, []);
   // Update HTML class when dark mode changes
   useEffect(() => {
     const root = window.document.documentElement;
