@@ -1,20 +1,54 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# 🚀 Career Command Center
 
-# Run and deploy your AI Studio app
+An elite, full-stack career strategic coach dashboard. Automatically analyzes resume ATS mapping, detects skill/experience gaps, generates customized interview response scripts, objections prep sheets, and provides high-leverage compensation negotiation frameworks.
 
-This contains everything you need to run your app locally.
+## Key Features
 
-View your app in AI Studio: https://ai.studio/apps/d4beba86-9d2f-43d8-8316-1c3c517e09c9
+- **ATS Mapping & Score Analyzer**: Scans resumes against job descriptions to extract missing keyword badges and metrics.
+- **Competency Diagnostic**: Generates tailored questions targeting discovered experience gaps.
+- **Objection Response Strategies**: Prepares candidates for tough recruiter pushbacks.
+- **Compensation Negotiator**: High-leverage scripts, typical HR interview queries, and redirect frameworks.
+- **Supabase Cloud Sync**: Saves and loads previous preparation kits across logins.
+- **Google Auth Integration**: Fast, secure access with session persistence.
 
-## Run Locally
+## Tech Stack
 
-**Prerequisites:**  Node.js
+- **Frontend**: React, TypeScript, Tailwind CSS, Lucide icons, Motion
+- **Backend**: Express, Multer, Node.js, Google GenAI SDK (Gemini)
+- **Database & Auth**: Supabase DB, Firebase Authentication
 
+## Getting Started
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Prerequisites
+
+- Node.js (v18+)
+- npm
+
+### Installation & Run
+
+1. Clone the repository and install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Configure environment variables. Create a `.env` file in the root directory based on `.env.example`:
+   ```env
+   # API Keys
+   GEMINI_API_KEY="your-gemini-api-key"
+   
+   # Firebase Auth
+   VITE_FIREBASE_API_KEY="your-api-key"
+   VITE_FIREBASE_AUTH_DOMAIN="your-auth-domain"
+   VITE_FIREBASE_PROJECT_ID="your-project-id"
+
+   # Supabase DB
+   VITE_SUPABASE_URL="your-supabase-url"
+   VITE_SUPABASE_ANON_KEY="your-anon-key"
+   ```
+
+3. Launch the local development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.

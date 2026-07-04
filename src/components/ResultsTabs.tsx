@@ -47,6 +47,11 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
   };
 
   // Safely extract nested structures with robust defaults to survive missing data models
+  const skillGaps = data.skill_gaps ?? [];
+  const questions = data.questions ?? [];
+  const pushbackQuestions = data.pushback_questions ?? [];
+  const coachReport = data.coach_report ?? "";
+
   const atsScore = data.ats_analysis?.ats_score ?? 70;
   const missingKeywords = data.ats_analysis?.missing_keywords ?? [];
   const resumeImprovements = data.ats_analysis?.resume_improvements ?? [];
@@ -111,7 +116,7 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
                 </div>
 
                 <div className="grid grid-cols-1 gap-3">
-                  {data.skill_gaps.map((gap, i) => (
+                  {skillGaps.map((gap, i) => (
                     <div
                       key={i}
                       className="group relative p-4 rounded-xl border border-slate-200/40 dark:border-white/5 bg-slate-50/20 dark:bg-white/5 backdrop-blur-md hover:border-blue-500/30 dark:hover:border-white/15 transition-all flex items-start gap-3"
@@ -171,7 +176,7 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  {data.questions.map((question, i) => (
+                  {questions.map((question, i) => (
                     <div
                       key={i}
                       className="group relative p-5 rounded-2xl border border-slate-200/40 dark:border-white/5 bg-slate-50/20 dark:bg-white/5 backdrop-blur-md hover:border-blue-500/20 transition-all"
@@ -213,7 +218,7 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  {data.pushback_questions.map((pushback, i) => (
+                  {pushbackQuestions.map((pushback, i) => (
                     <div
                       key={i}
                       className="group relative p-5 rounded-2xl border border-slate-200/40 dark:border-white/5 bg-slate-50/20 dark:bg-white/5 backdrop-blur-md hover:border-rose-500/20 transition-all"
@@ -261,7 +266,7 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
                     Executive Coach Briefing
                   </span>
                   <button
-                    onClick={() => handleCopyText(data.coach_report, "coach_report")}
+                    onClick={() => handleCopyText(coachReport, "coach_report")}
                     className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
                   >
                     {copiedIndex === "coach_report" ? (
@@ -280,7 +285,7 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
 
                 {/* Render elegant Markdown content using simple div wrapper and styling class */}
                 <div className="prose prose-slate dark:prose-invert max-w-none text-sm leading-relaxed text-slate-700 dark:text-slate-300 space-y-4 overflow-x-hidden md:text-base markdown-body">
-                  <ReactMarkdown>{data.coach_report}</ReactMarkdown>
+                  <ReactMarkdown>{coachReport}</ReactMarkdown>
                 </div>
               </div>
             )}

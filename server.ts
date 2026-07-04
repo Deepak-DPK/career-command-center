@@ -40,11 +40,6 @@ function getGeminiClient(): GoogleGenAI | null {
     try {
       ai = new GoogleGenAI({
         apiKey: apiKey,
-        httpOptions: {
-          headers: {
-            "User-Agent": "aistudio-build",
-          },
-        },
       });
       console.log("Successfully initialized real Gemini SDK Client with VITE/GEMINI secret keys.");
     } catch (error) {

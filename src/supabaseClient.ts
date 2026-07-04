@@ -81,7 +81,7 @@ export async function fetchPrepKitsFromDB(userId: string): Promise<SavedPrepKit[
 
       if (error) throw error;
 
-      return data.map((row: any) => ({
+      return (data || []).map((row: any) => ({
         id: row.id,
         userId: row.user_id,
         jobDescription: row.job_description,
