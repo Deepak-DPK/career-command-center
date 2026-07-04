@@ -99,3 +99,5 @@ Vercel natively supports Next.js and standard Vite configurations with serverles
    - `GEMINI_API_KEY`
    - `VITE_FIREBASE_API_KEY`
    - `VITE_FIREBASE_PROJECT_ID`
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`

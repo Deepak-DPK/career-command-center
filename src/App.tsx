@@ -23,7 +23,18 @@ import ResultsTabs from "./components/ResultsTabs";
 import LoadingOverlay from "./components/LoadingOverlay";
 import ErrorToast from "./components/ErrorToast";
 
-import { signInWithGoogle, signOutUser, isRealFirebase } from "./firebase/config";
+import { 
+  signInWithGoogle, 
+  signOutUser, 
+  isRealFirebase, 
+  auth 
+} from "./firebase/config";
+import { 
+  savePrepKitToDB, 
+  fetchPrepKitsFromDB, 
+  SavedPrepKit 
+} from "./supabaseClient";
+import { onAuthStateChanged } from "firebase/auth";
 import { generatePrepKit } from "./services/api";
 import { SAMPLE_JOBS } from "./data/samples";
 
@@ -36,6 +47,10 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
   const [sampleIndex, setSampleIndex] = useState(0);
+
+  // History states
+  const [history, setHistory] = useState<SavedPrepKit[]>([]);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
   // App running states
   const [isLoading, setIsLoading] = useState(false);
@@ -74,6 +89,50 @@ export default function App() {
       }
     }
   }, []);
+
+  // Listen for real Firebase auth session updates to persist login on refresh
+  useEffect(() => {
+    if (isRealFirebase && auth) {
+      const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        if (firebaseUser) {
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL,
+          });
+        } else {
+          setUser((currentUser) => {
+            if (currentUser?.isMockUser) {
+              return currentUser;
+            }
+            return null;
+          });
+        }
+      });
+      return () => unsubscribe();
+    }
+  }, []);
+
+  // Fetch history when user session changes
+  useEffect(() => {
+    if (user) {
+      const loadHistory = async () => {
+        setIsHistoryLoading(true);
+        try {
+          const kits = await fetchPrepKitsFromDB(user.uid);
+          setHistory(kits);
+        } catch (error) {
+          console.error("Failed to load user history:", error);
+        } finally {
+          setIsHistoryLoading(false);
+        }
+      };
+      loadHistory();
+    } else {
+      setHistory([]);
+    }
+  }, [user]);
 
   // Update HTML class when dark mode changes
   useEffect(() => {
@@ -176,6 +235,32 @@ export default function App() {
       localStorage.setItem("ccc_latest_kit", JSON.stringify(result));
       localStorage.setItem("ccc_latest_job", jobDescription);
 
+      // Save to database/history if user logged in
+      if (user) {
+        try {
+          const docId = await savePrepKitToDB(
+            user.uid,
+            jobDescription,
+            selectedFile.name,
+            result
+          );
+          setHistory((prev) => [
+            {
+              id: docId,
+              userId: user.uid,
+              jobDescription,
+              resumeFilename: selectedFile.name,
+              prepKit: result,
+              createdAt: new Date().toISOString(),
+            },
+            ...prev,
+          ]);
+        } catch (dbError) {
+          console.error("Failed to save kit to database:", dbError);
+          addToast("Failed to save report to database history.", "error");
+        }
+      }
+
       // Brief success animation flash
       setTimeout(() => setIsSuccess(false), 3000);
     } catch (error: any) {
@@ -183,6 +268,14 @@ export default function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLoadHistoryItem = (item: SavedPrepKit) => {
+    setPrepKit(item.prepKit);
+    setJobDescription(item.jobDescription);
+    addToast(`Loaded Strategy Package for ${item.resumeFilename}!`, "success");
+    localStorage.setItem("ccc_latest_kit", JSON.stringify(item.prepKit));
+    localStorage.setItem("ccc_latest_job", item.jobDescription);
   };
 
   return (
@@ -265,6 +358,64 @@ export default function App() {
                   isLoading={isLoading}
                   isSuccess={isSuccess}
                 />
+
+                {/* Saved Strategy History Panel */}
+                <div className="bg-white/45 dark:bg-white/5 backdrop-blur-xl p-5 rounded-2xl border border-slate-200/50 dark:border-white/10 shadow-xl flex flex-col gap-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-2">
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-indigo-500" />
+                      Saved Strategy History
+                    </h3>
+                    <span className="text-[10px] bg-indigo-100/60 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-0.5 rounded-full font-semibold">
+                      {history.length} Saved
+                    </span>
+                  </div>
+
+                  {isHistoryLoading ? (
+                    <div className="flex items-center justify-center py-6 text-xs text-slate-400">
+                      <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mr-2" />
+                      Loading history...
+                    </div>
+                  ) : history.length === 0 ? (
+                    <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-4">
+                      No saved strategy kits yet. Generate your first kit to save it here!
+                    </p>
+                  ) : (
+                    <div className="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1">
+                      {history.map((item) => {
+                        const date = item.createdAt 
+                          ? new Date(item.createdAt)
+                          : new Date();
+                        const formattedDate = date.toLocaleDateString(undefined, { 
+                          month: "short", 
+                          day: "numeric", 
+                          hour: "2-digit", 
+                          minute: "2-digit" 
+                        });
+
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => handleLoadHistoryItem(item)}
+                            className="w-full text-left p-3 rounded-xl border border-slate-100 dark:border-white/5 hover:border-indigo-500/50 hover:bg-indigo-50/10 dark:hover:bg-indigo-950/20 transition-all duration-200 flex flex-col gap-1 cursor-pointer group"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate max-w-[170px] group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                                {item.resumeFilename}
+                              </span>
+                              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">
+                                {formattedDate}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate line-clamp-1">
+                              {item.jobDescription}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
 
                 {/* Sandbox / Real Firebase Notice Box */}
                 <div className="p-4 rounded-xl border border-slate-200/40 dark:border-white/5 bg-slate-100/30 dark:bg-white/5 backdrop-blur-md text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">

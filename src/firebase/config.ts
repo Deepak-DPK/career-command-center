@@ -20,8 +20,6 @@ let isRealFirebase = false;
 
 // Attempt to initialize Firebase SDK
 try {
-  // We can declare a template or attempt to retrieve from window/environment configuration
-  // For safety and portability in AI Studio container previews, we allow fallback
   const configEnv = {
     apiKey: (import.meta as any).env.VITE_FIREBASE_API_KEY,
     authDomain: (import.meta as any).env.VITE_FIREBASE_AUTH_DOMAIN,
