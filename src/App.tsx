@@ -23,7 +23,12 @@ import ResultsTabs from "./components/ResultsTabs";
 import LoadingOverlay from "./components/LoadingOverlay";
 import ErrorToast from "./components/ErrorToast";
 
-import { signInWithGoogle, signOutUser, isRealFirebase } from "./firebase/config";
+import {
+  signInWithGoogle,
+  signOutUser,
+  isRealFirebase,
+  getPersistedUser
+} from "./firebase/config";
 import { generatePrepKit } from "./services/api";
 import { SAMPLE_JOBS } from "./data/samples";
 
