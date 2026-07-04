@@ -24,6 +24,12 @@ export interface SalaryNegotiation {
   recommended_answer_frameworks: AnswerFramework[];
 }
 
+export interface OutreachAssets {
+  cold_email: string;
+  linkedin_pitch: string;
+  thank_you_note: string;
+}
+
 export interface PrepKitResponse {
   skill_gaps: string[];
   ats_analysis: ATSAnalysis;
@@ -31,6 +37,7 @@ export interface PrepKitResponse {
   pushback_questions: string[];
   salary_negotiation: SalaryNegotiation;
   coach_report: string;
+  outreach_assets?: OutreachAssets;
 }
 
 export interface ToastMessage {

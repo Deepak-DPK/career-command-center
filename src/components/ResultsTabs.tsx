@@ -11,7 +11,9 @@ import {
   Award,
   Sparkles,
   Gauge,
-  Coins
+  Coins,
+  Download,
+  Send
 } from "lucide-react";
 import { PrepKitResponse } from "../types";
 
@@ -37,6 +39,7 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
     { id: "core_questions", label: "Core Questions", icon: <FileText className="w-4 h-4" /> },
     { id: "tough_scenarios", label: "Tough Scenarios", icon: <ShieldAlert className="w-4 h-4" /> },
     { id: "salary_negotiation", label: "Salary Negotiation", icon: <Coins className="w-4 h-4" /> },
+    { id: "outreach_pitch", label: "Outreach Pitch", icon: <Send className="w-4 h-4" /> },
     { id: "coach_strategy", label: "Coach Strategy", icon: <Compass className="w-4 h-4" /> },
   ];
 
@@ -51,6 +54,12 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
   const questions = data.questions ?? [];
   const pushbackQuestions = data.pushback_questions ?? [];
   const coachReport = data.coach_report ?? "";
+  
+  const outreachAssets = data.outreach_assets ?? {
+    cold_email: "Generating cold email...",
+    linkedin_pitch: "Generating LinkedIn pitch...",
+    thank_you_note: "Generating thank-you note..."
+  };
 
   const atsScore = data.ats_analysis?.ats_score ?? 70;
   const missingKeywords = data.ats_analysis?.missing_keywords ?? [];
@@ -258,33 +267,185 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
               </div>
             )}
 
-            {/* Tab 6: Coach Strategy (index 5) */}
+            {/* Tab 6: Outreach Pitch (index 5) */}
             {activeTab === 5 && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
+                    Professional Networking Assets
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6">
+                  {/* Card 1: Cold Email to Hiring Manager */}
+                  <div className="p-5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/50 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                        <FileText className="w-4 h-4 text-indigo-500" />
+                        Cold Email Pitch (Hiring Manager)
+                      </h4>
+                      <button
+                        onClick={() => handleCopyText(outreachAssets.cold_email, "cold_email")}
+                        className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+                      >
+                        {copiedIndex === "cold_email" ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy Email</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <pre className="text-xs p-4 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap leading-relaxed border border-slate-100 dark:border-slate-900/50 max-h-[300px] overflow-y-auto">
+                      {outreachAssets.cold_email}
+                    </pre>
+                  </div>
+
+                  {/* Card 2: LinkedIn Message */}
+                  <div className="p-5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/50 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                        <Send className="w-4 h-4 text-indigo-500" />
+                        LinkedIn Invite Pitch (Recruiter)
+                      </h4>
+                      <button
+                        onClick={() => handleCopyText(outreachAssets.linkedin_pitch, "linkedin_pitch")}
+                        className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+                      >
+                        {copiedIndex === "linkedin_pitch" ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy Pitch</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <pre className="text-xs p-4 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap leading-relaxed border border-slate-100 dark:border-slate-900/50 max-h-[150px] overflow-y-auto">
+                      {outreachAssets.linkedin_pitch}
+                    </pre>
+                    <div className="text-[10px] text-slate-400 dark:text-slate-500 flex items-center justify-between">
+                      <span>Designed to fit under LinkedIn's 300 character limit.</span>
+                      <span>Length: {outreachAssets.linkedin_pitch.length} chars</span>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Thank You Note */}
+                  <div className="p-5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/50 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                        <Award className="w-4 h-4 text-indigo-500" />
+                        Post-Interview Thank You Note
+                      </h4>
+                      <button
+                        onClick={() => handleCopyText(outreachAssets.thank_you_note, "thank_you_note")}
+                        className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+                      >
+                        {copiedIndex === "thank_you_note" ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy Note</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <pre className="text-xs p-4 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap leading-relaxed border border-slate-100 dark:border-slate-900/50 max-h-[300px] overflow-y-auto">
+                      {outreachAssets.thank_you_note}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tab 7: Coach Strategy (index 6) */}
+            {activeTab === 6 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
                     Executive Coach Briefing
                   </span>
-                  <button
-                    onClick={() => handleCopyText(coachReport, "coach_report")}
-                    className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
-                  >
-                    {copiedIndex === "coach_report" ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Copied Report!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5" />
-                        <span>Copy Markdown</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* Copy Button */}
+                    <button
+                      onClick={() => handleCopyText(coachReport, "coach_report")}
+                      className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+                    >
+                      {copiedIndex === "coach_report" ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copy Markdown</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Download PDF Button */}
+                    <button
+                      onClick={() => {
+                        const printContent = document.getElementById("printable-coach-report")?.innerHTML;
+                        if (printContent) {
+                          const win = window.open("", "_blank");
+                          if (win) {
+                            win.document.write(`
+                              <html>
+                                <head>
+                                  <title>Career Command Center Strategy Report</title>
+                                  <style>
+                                    body { font-family: system-ui, -apple-system, sans-serif; padding: 40px; color: #1e293b; line-height: 1.6; max-width: 800px; margin: 0 auto; }
+                                    pre { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; overflow-x: auto; }
+                                    code { font-family: monospace; background: #f1f5f9; padding: 2px 4px; border-radius: 4px; font-size: 0.9em; }
+                                    h1 { color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 8px; font-size: 1.8em; margin-top: 30px; }
+                                    h2 { color: #1e40af; border-bottom: 1px solid #93c5fd; padding-bottom: 6px; font-size: 1.4em; margin-top: 25px; }
+                                    h3 { color: #1e3a8a; font-size: 1.1em; margin-top: 20px; }
+                                    blockquote { border-left: 4px solid #3b82f6; padding: 8px 16px; background: #eff6ff; color: #1e3a8a; font-style: italic; border-radius: 0 8px 8px 0; margin: 20px 0; }
+                                    ul, ol { padding-left: 20px; }
+                                    li { margin-bottom: 6px; }
+                                    hr { border: 0; border-top: 1px solid #cbd5e1; margin: 30px 0; }
+                                  </style>
+                                </head>
+                                <body>
+                                  ${printContent}
+                                  <script>
+                                    window.onload = function() {
+                                      window.print();
+                                      window.close();
+                                    }
+                                  </script>
+                                </body>
+                              </html>
+                            `);
+                            win.document.close();
+                          }
+                        }
+                      }}
+                      className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-indigo-600 hover:bg-indigo-700 text-white transition-colors cursor-pointer shadow-sm"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download PDF</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Render elegant Markdown content using simple div wrapper and styling class */}
-                <div className="prose prose-slate dark:prose-invert max-w-none text-sm leading-relaxed text-slate-700 dark:text-slate-300 space-y-4 overflow-x-hidden md:text-base markdown-body">
+                <div id="printable-coach-report" className="prose prose-slate dark:prose-invert max-w-none text-sm leading-relaxed text-slate-700 dark:text-slate-300 space-y-4 overflow-x-hidden md:text-base markdown-body">
                   <ReactMarkdown>{coachReport}</ReactMarkdown>
                 </div>
               </div>
