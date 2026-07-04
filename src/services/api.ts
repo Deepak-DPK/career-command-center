@@ -6,7 +6,7 @@ const API_BASE_URL = (import.meta as any).env.VITE_API_URL || "https://career-co
 
 const apiInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 45000, // 45-second timeout for complex PDF analyzing operations
+  timeout: 300000, // 45-second timeout for complex PDF analyzing operations
 });
 
 /**
