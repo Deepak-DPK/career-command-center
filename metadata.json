@@ -1,0 +1,8 @@
+{
+  "name": "Career Command Center",
+  "description": "An AI-powered SaaS frontend and server analyzer designed to bridge resume gaps, draft targeted behavioral questions, formulate tactical responses to confrontational pushbacks, and output personalized executive interview coaching briefs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
