@@ -1,8 +1,15 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, UserCredential } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  UserCredential,
+  setPersistence,
+  browserLocalPersistence,
+  onAuthStateChanged
+} from "firebase/auth";
 import { UserSession } from "../types";
 
-// Standard Firebase config type
 interface FirebaseConfig {
   apiKey: string;
   authDomain: string;
@@ -18,10 +25,7 @@ let authInstance: any = null;
 let providerInstance: any = null;
 let isRealFirebase = false;
 
-// Attempt to initialize Firebase SDK
 try {
-  // We can declare a template or attempt to retrieve from window/environment configuration
-  // For safety and portability in AI Studio container previews, we allow fallback
   const configEnv = {
     apiKey: (import.meta as any).env.VITE_FIREBASE_API_KEY,
     authDomain: (import.meta as any).env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -38,25 +42,25 @@ try {
     isRealFirebase = true;
     console.log("Firebase Authentication initialized successfully.");
   } else {
-    console.warn("No client-side VITE_FIREBASE_API_KEY detected. Authentication will run in Sandbox Mode.");
+    console.warn("No Firebase credentials found. Sandbox mode enabled.");
   }
 } catch (error) {
-  console.error("Failed to initialize Firebase Auth client library:", error);
+  console.error("Failed to initialize Firebase:", error);
 }
 
 export const auth = authInstance;
 export const googleProvider = providerInstance;
 export { isRealFirebase };
 
-/**
- * Handles signing in with Google.
- * Falls back to Sandbox Session if Firebase credentials are not provided.
- */
+
 export async function signInWithGoogle(): Promise<UserSession> {
   if (isRealFirebase && auth && googleProvider) {
     try {
+      await setPersistence(auth, browserLocalPersistence);
+
       const result: UserCredential = await signInWithPopup(auth, googleProvider);
       const user = result.user;
+
       return {
         uid: user.uid,
         email: user.email,
@@ -65,10 +69,9 @@ export async function signInWithGoogle(): Promise<UserSession> {
       };
     } catch (error: any) {
       console.error("Firebase sign-in failed:", error);
-      throw new Error(error?.message || "Google Authenticator failed.");
+      throw new Error(error?.message || "Google Authentication failed.");
     }
   } else {
-    // Sandbox Simulation Mode
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
@@ -83,9 +86,30 @@ export async function signInWithGoogle(): Promise<UserSession> {
   }
 }
 
-/**
- * Handles signing out the current session.
- */
+
+export function getPersistedUser(): Promise<UserSession | null> {
+  return new Promise((resolve) => {
+    if (!auth) {
+      resolve(null);
+      return;
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        resolve({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+        });
+      } else {
+        resolve(null);
+      }
+    });
+  });
+}
+
+
 export async function signOutUser(): Promise<void> {
   if (isRealFirebase && auth) {
     await auth.signOut();
