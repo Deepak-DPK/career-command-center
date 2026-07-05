@@ -15,7 +15,8 @@ import {
   Download,
   Send,
   MessageSquare,
-  Loader2
+  Loader2,
+  Lock
 } from "lucide-react";
 import { PrepKitResponse } from "../types";
 import { sendChatMessage, ChatMessage } from "../services/api";
@@ -31,9 +32,10 @@ import AnswerFrameworkAccordion from "./AnswerFrameworkAccordion";
 interface ResultsTabsProps {
   data: PrepKitResponse;
   jobDescription?: string;
+  isLoggedIn?: boolean;
 }
 
-export default function ResultsTabs({ data, jobDescription = "" }: ResultsTabsProps) {
+export default function ResultsTabs({ data, jobDescription = "", isLoggedIn = false }: ResultsTabsProps) {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -53,7 +55,11 @@ export default function ResultsTabs({ data, jobDescription = "" }: ResultsTabsPr
     { id: "salary_negotiation", label: "Salary Negotiation", icon: <Coins className="w-4 h-4" /> },
     { id: "outreach_pitch", label: "Outreach Pitch", icon: <Send className="w-4 h-4" /> },
     { id: "coach_strategy", label: "Coach Strategy", icon: <Compass className="w-4 h-4" /> },
-    { id: "ai_chat", label: "AI Mentor Chat", icon: <MessageSquare className="w-4 h-4" /> },
+    { 
+      id: "ai_chat", 
+      label: "AI Mentor Chat", 
+      icon: isLoggedIn ? <MessageSquare className="w-4 h-4" /> : <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" /> 
+    },
   ];
 
   const handleCopyText = (text: string, id: string) => {
@@ -499,7 +505,18 @@ export default function ResultsTabs({ data, jobDescription = "" }: ResultsTabsPr
 
             {/* Tab 8: AI Mentor Chat (index 7) */}
             {activeTab === 7 && (
-              <div className="flex flex-col h-[520px] bg-slate-50/10 dark:bg-slate-950/20 overflow-hidden">
+              <div className="flex flex-col h-[520px] bg-slate-50/10 dark:bg-slate-950/20 overflow-hidden relative">
+                {!isLoggedIn && (
+                  <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center">
+                    <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+                      <Lock className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Premium Feature Locked</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm mb-6">
+                      Unlock the interactive AI Mentor Chat and query your resume strategy live by creating a free account.
+                    </p>
+                  </div>
+                )}
                 {/* Chat Header Info */}
                 <div className="px-5 py-3 border-b border-slate-200/40 dark:border-white/5 bg-slate-100/30 dark:bg-white/5 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-2">
