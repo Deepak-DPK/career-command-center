@@ -273,7 +273,7 @@ export default function App() {
     setIsSuccess(false);
 
     try {
-      const result = await generatePrepKit(selectedFile, jobDescription);
+      const result = await generatePrepKit(selectedFile, jobDescription, user?.uid);
       setPrepKit(result);
       setIsSuccess(true);
       addToast("Analysis completed! Career Prep Kit successfully generated.", "success");

@@ -100,7 +100,8 @@ export default function ResultsTabs({ data, jobDescription = "" }: ResultsTabsPr
         userMessage,
         chatMessages,
         resumeText,
-        jobDesc
+        jobDesc,
+        data.resume_id ?? undefined
       );
 
       setChatMessages((prev) => [...prev, { role: "assistant", content: reply } as ChatMessage]);

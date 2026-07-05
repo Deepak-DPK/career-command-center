@@ -39,6 +39,7 @@ export interface PrepKitResponse {
   coach_report: string;
   outreach_assets?: OutreachAssets;
   resume_text?: string;
+  resume_id?: string | null;
 }
 
 export interface ToastMessage {

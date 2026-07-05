@@ -16,11 +16,15 @@ const apiInstance = axios.create({
 export async function generatePrepKit(
   resumeFile: File,
   jobDescription: string,
+  userId?: string,
   onProgress?: (percent: number) => void
 ): Promise<PrepKitResponse> {
   const formData = new FormData();
   formData.append("resume", resumeFile);
   formData.append("job_description", jobDescription);
+  if (userId) {
+    formData.append("user_id", userId);
+  }
 
   try {
     const response = await apiInstance.post<PrepKitResponse>("/generate-prep-kit", formData, {
@@ -64,7 +68,8 @@ export async function sendChatMessage(
   message: string,
   history: ChatMessage[],
   resumeText: string,
-  jobDescription: string
+  jobDescription: string,
+  resumeId?: string
 ): Promise<string> {
   try {
     const response = await apiInstance.post<{ reply: string }>("/chat", {
@@ -72,6 +77,7 @@ export async function sendChatMessage(
       history,
       resume_text: resumeText,
       job_description: jobDescription,
+      resume_id: resumeId,
     });
     return response.data.reply;
   } catch (error: any) {
