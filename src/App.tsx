@@ -477,23 +477,6 @@ export default function App() {
                   )}
                 </div>
 
-                {/* Sandbox / Real Firebase Notice Box */}
-                <div className="p-4 rounded-xl border border-slate-200/40 dark:border-white/5 bg-slate-100/30 dark:bg-white/5 backdrop-blur-md text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200 mb-1">
-                    <Lock className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>Deployment & Key Integrations</span>
-                  </div>
-                  {!isRealFirebase ? (
-                    <p>
-                      Currently operating in <span className="text-indigo-600 dark:text-indigo-400 font-bold">Sandbox Mode</span>. 
-                      You can drop any PDF file and job description to preview high-fidelity strategic coaching mock data instantly. To activate actual Gemini processing, declare your <span className="font-mono">GEMINI_API_KEY</span> in the project's Secrets panel.
-                    </p>
-                  ) : (
-                    <p>
-                      Connected securely to Google Gemini API on the server. All calculations are handled without browser exposures. To configure persistent hosting, run <span className="font-mono">npm run build</span> and export your artifact.
-                    </p>
-                  )}
-                </div>
               </div>
 
               {/* Right Column (AI Insights Output) - Takes 7 grid spots */}
