@@ -10,7 +10,8 @@ import {
   HelpCircle,
   FileCheck2,
   Lock,
-  Compass
+  Compass,
+  Trash2
 } from "lucide-react";
 
 import { UserSession, PrepKitResponse, ToastMessage } from "./types";
@@ -32,6 +33,7 @@ import {
 import { 
   savePrepKitToDB, 
   fetchPrepKitsFromDB, 
+  deletePrepKitFromDB,
   SavedPrepKit 
 } from "./supabaseClient";
 import { onAuthStateChanged } from "firebase/auth";
@@ -80,7 +82,7 @@ export default function App() {
     }
 
     // Load cached sandbox session if available
-    const cachedUser = localStorage.getItem("ccc_sandbox_user");
+    const cachedUser = sessionStorage.getItem("ccc_sandbox_user");
     if (cachedUser) {
       try {
         setUser(JSON.parse(cachedUser));
@@ -166,7 +168,7 @@ export default function App() {
       
       // Persist sandbox session if applicable
       if (session.isMockUser) {
-        localStorage.setItem("ccc_sandbox_user", JSON.stringify(session));
+        sessionStorage.setItem("ccc_sandbox_user", JSON.stringify(session));
       }
     } catch (error: any) {
       addToast(error?.message || "Sign-in with Google failed.", "error");
@@ -196,7 +198,7 @@ export default function App() {
     try {
       await signOutUser();
       setUser(null);
-      localStorage.removeItem("ccc_sandbox_user");
+      sessionStorage.removeItem("ccc_sandbox_user");
       addToast("Successfully logged out.", "info");
     } catch (error) {
       addToast("Failed to clear auth session.", "error");
@@ -276,6 +278,21 @@ export default function App() {
     addToast(`Loaded Strategy Package for ${item.resumeFilename}!`, "success");
     localStorage.setItem("ccc_latest_kit", JSON.stringify(item.prepKit));
     localStorage.setItem("ccc_latest_job", item.jobDescription);
+  };
+
+  const handleDeleteHistoryItem = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this saved prep kit?")) {
+      return;
+    }
+    try {
+      await deletePrepKitFromDB(id);
+      setHistory((prev) => prev.filter((item) => item.id !== id));
+      addToast("Saved strategy kit deleted.", "success");
+    } catch (error) {
+      console.error("Failed to delete prep kit:", error);
+      addToast("Failed to delete the saved strategy kit.", "error");
+    }
   };
 
   return (
@@ -394,23 +411,34 @@ export default function App() {
                         });
 
                         return (
-                          <button
+                          <div
                             key={item.id}
-                            onClick={() => handleLoadHistoryItem(item)}
-                            className="w-full text-left p-3 rounded-xl border border-slate-100 dark:border-white/5 hover:border-indigo-500/50 hover:bg-indigo-50/10 dark:hover:bg-indigo-950/20 transition-all duration-200 flex flex-col gap-1 cursor-pointer group"
+                            className="w-full flex items-center gap-2 p-3 rounded-xl border border-slate-100 dark:border-white/5 hover:border-indigo-500/50 hover:bg-indigo-50/10 dark:hover:bg-indigo-950/20 transition-all duration-200 group relative"
                           >
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate max-w-[170px] group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-                                {item.resumeFilename}
-                              </span>
-                              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">
-                                {formattedDate}
-                              </span>
-                            </div>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate line-clamp-1">
-                              {item.jobDescription}
-                            </p>
-                          </button>
+                            <button
+                              onClick={() => handleLoadHistoryItem(item)}
+                              className="flex-1 text-left flex flex-col gap-1 cursor-pointer min-w-0"
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                                  {item.resumeFilename}
+                                </span>
+                                <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono shrink-0">
+                                  {formattedDate}
+                                </span>
+                              </div>
+                              <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate line-clamp-1">
+                                {item.jobDescription}
+                              </p>
+                            </button>
+                            <button
+                              onClick={(e) => handleDeleteHistoryItem(e, item.id)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all duration-200 cursor-pointer shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                              title="Delete saved kit"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         );
                       })}
                     </div>

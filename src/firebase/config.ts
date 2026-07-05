@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, UserCredential } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup, UserCredential, setPersistence, browserSessionPersistence } from "firebase/auth";
 import { UserSession } from "../types";
 
 // Standard Firebase config type
@@ -32,6 +32,10 @@ try {
   if (configEnv.apiKey) {
     const app = getApps().length === 0 ? initializeApp(configEnv) : getApp();
     authInstance = getAuth(app);
+    // Set session persistence to clear when the window/tab is closed
+    setPersistence(authInstance, browserSessionPersistence).catch((error) => {
+      console.error("Failed to set Firebase Auth persistence to browser session:", error);
+    });
     providerInstance = new GoogleAuthProvider();
     isRealFirebase = true;
     console.log("Firebase Authentication initialized successfully.");

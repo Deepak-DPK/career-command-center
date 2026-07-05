@@ -99,3 +99,28 @@ export async function fetchPrepKitsFromDB(userId: string): Promise<SavedPrepKit[
     return mockHistory.filter((item: any) => item.userId === userId);
   }
 }
+
+/**
+ * Deletes a saved Career Prep Kit from Supabase (or LocalStorage in sandbox mode).
+ */
+export async function deletePrepKitFromDB(id: string): Promise<void> {
+  if (isRealSupabase && supabase) {
+    try {
+      const { error } = await supabase
+        .from("prep_kits")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Failed to delete prep kit from Supabase:", error);
+      throw error;
+    }
+  } else {
+    // Sandbox / Mock Storage Fallback
+    const mockHistory = JSON.parse(localStorage.getItem("ccc_mock_history") || "[]");
+    const updatedHistory = mockHistory.filter((item: any) => item.id !== id);
+    localStorage.setItem("ccc_mock_history", JSON.stringify(updatedHistory));
+  }
+}
+
