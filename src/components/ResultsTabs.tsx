@@ -143,7 +143,9 @@ export default function ResultsTabs({ data, jobDescription = "" }: ResultsTabsPr
       </div>
 
       {/* Tab Content Display Area */}
-      <div className="flex-1 p-6 overflow-y-auto min-h-[420px] max-h-[720px] scrollbar-thin">
+      <div className={`flex-1 overflow-y-auto min-h-[420px] max-h-[720px] scrollbar-thin ${
+        activeTab === 7 ? "p-0 overflow-y-hidden" : "p-6"
+      }`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -151,7 +153,7 @@ export default function ResultsTabs({ data, jobDescription = "" }: ResultsTabsPr
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="space-y-6"
+            className={activeTab === 7 ? "h-full flex flex-col" : "space-y-6"}
           >
             {/* Tab 1: Skill Gaps (index 0) */}
             {activeTab === 0 && (
@@ -497,7 +499,7 @@ export default function ResultsTabs({ data, jobDescription = "" }: ResultsTabsPr
 
             {/* Tab 8: AI Mentor Chat (index 7) */}
             {activeTab === 7 && (
-              <div className="flex flex-col h-[500px] max-h-[500px] border border-slate-200/40 dark:border-white/5 bg-slate-50/10 dark:bg-slate-950/20 rounded-2xl overflow-hidden">
+              <div className="flex flex-col h-[520px] bg-slate-50/10 dark:bg-slate-950/20 overflow-hidden">
                 {/* Chat Header Info */}
                 <div className="px-5 py-3 border-b border-slate-200/40 dark:border-white/5 bg-slate-100/30 dark:bg-white/5 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-2">
