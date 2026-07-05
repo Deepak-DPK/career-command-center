@@ -52,9 +52,21 @@ export default function ResultsTabs({ data, jobDescription = "", isLoggedIn = fa
     { id: "ats_optimization", label: "ATS Optimization", icon: <Gauge className="w-4 h-4" /> },
     { id: "core_questions", label: "Core Questions", icon: <FileText className="w-4 h-4" /> },
     { id: "tough_scenarios", label: "Tough Scenarios", icon: <ShieldAlert className="w-4 h-4" /> },
-    { id: "salary_negotiation", label: "Salary Negotiation", icon: <Coins className="w-4 h-4" /> },
-    { id: "outreach_pitch", label: "Outreach Pitch", icon: <Send className="w-4 h-4" /> },
-    { id: "coach_strategy", label: "Coach Strategy", icon: <Compass className="w-4 h-4" /> },
+    { 
+      id: "salary_negotiation", 
+      label: "Salary Negotiation", 
+      icon: isLoggedIn ? <Coins className="w-4 h-4" /> : <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" /> 
+    },
+    { 
+      id: "outreach_pitch", 
+      label: "Outreach Pitch", 
+      icon: isLoggedIn ? <Send className="w-4 h-4" /> : <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" /> 
+    },
+    { 
+      id: "coach_strategy", 
+      label: "Coach Strategy", 
+      icon: isLoggedIn ? <Compass className="w-4 h-4" /> : <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" /> 
+    },
     { 
       id: "ai_chat", 
       label: "AI Mentor Chat", 
@@ -307,7 +319,18 @@ export default function ResultsTabs({ data, jobDescription = "", isLoggedIn = fa
 
             {/* Tab 5: Salary Negotiation (index 4) */}
             {activeTab === 4 && (
-              <div className="space-y-6">
+              <div className="space-y-6 relative">
+                {!isLoggedIn && (
+                  <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center rounded-xl">
+                    <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+                      <Lock className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Premium Feature Locked</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm mb-6">
+                      Unlock tailored salary negotiation scripts, HR leverage questions, and compensation insights by creating a free account.
+                    </p>
+                  </div>
+                )}
                 {/* 1. Tactical leverage tips highlights */}
                 <NegotiationTips tips={negotiationTips} />
 
@@ -321,7 +344,18 @@ export default function ResultsTabs({ data, jobDescription = "", isLoggedIn = fa
 
             {/* Tab 6: Outreach Pitch (index 5) */}
             {activeTab === 5 && (
-              <div className="space-y-6">
+              <div className="space-y-6 relative">
+                {!isLoggedIn && (
+                  <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center rounded-xl">
+                    <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+                      <Lock className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Premium Feature Locked</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm mb-6">
+                      Unlock tailored Cold Emails, LinkedIn Invites, and Post-Interview Thank You notes by creating a free account.
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
                     Professional Networking Assets
@@ -425,7 +459,18 @@ export default function ResultsTabs({ data, jobDescription = "", isLoggedIn = fa
 
             {/* Tab 7: Coach Strategy (index 6) */}
             {activeTab === 6 && (
-              <div className="space-y-4">
+              <div className="space-y-4 relative">
+                {!isLoggedIn && (
+                  <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center rounded-xl">
+                    <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+                      <Lock className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Premium Feature Locked</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm mb-6">
+                      Unlock your complete Executive Coach Strategy report—including critical gaps, presentation tactics, and overall assessment—by creating a free account.
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
                     Executive Coach Briefing
