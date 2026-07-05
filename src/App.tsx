@@ -535,7 +535,7 @@ export default function App() {
                       </div>
 
                       <div className="flex-1 flex flex-col">
-                        <ResultsTabs data={prepKit} />
+                        <ResultsTabs data={prepKit} jobDescription={jobDescription} />
                       </div>
                     </motion.div>
                   ) : (

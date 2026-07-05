@@ -51,3 +51,35 @@ export async function generatePrepKit(
     throw new Error(error.message || "Failed to communicate with Career Command Center server.");
   }
 }
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+/**
+ * Service to communicate with the RAG Chat API on the backend.
+ */
+export async function sendChatMessage(
+  message: string,
+  history: ChatMessage[],
+  resumeText: string,
+  jobDescription: string
+): Promise<string> {
+  try {
+    const response = await apiInstance.post<{ reply: string }>("/chat", {
+      message,
+      history,
+      resume_text: resumeText,
+      job_description: jobDescription,
+    });
+    return response.data.reply;
+  } catch (error: any) {
+    console.error("API error during chat:", error);
+    const serverErrorMessage = error.response?.data?.error || error.response?.data?.details || error.response?.data?.detail;
+    if (serverErrorMessage) {
+      throw new Error(serverErrorMessage);
+    }
+    throw new Error("Failed to communicate with Career Command Center AI Mentor.");
+  }
+}

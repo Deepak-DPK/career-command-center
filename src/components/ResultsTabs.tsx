@@ -13,9 +13,12 @@ import {
   Gauge,
   Coins,
   Download,
-  Send
+  Send,
+  MessageSquare,
+  Loader2
 } from "lucide-react";
 import { PrepKitResponse } from "../types";
+import { sendChatMessage, ChatMessage } from "../services/api";
 
 // Import custom reusable sub-components
 import ATSScoreCard from "./ATSScoreCard";
@@ -27,11 +30,20 @@ import AnswerFrameworkAccordion from "./AnswerFrameworkAccordion";
 
 interface ResultsTabsProps {
   data: PrepKitResponse;
+  jobDescription?: string;
 }
 
-export default function ResultsTabs({ data }: ResultsTabsProps) {
+export default function ResultsTabs({ data, jobDescription = "" }: ResultsTabsProps) {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    {
+      role: "assistant",
+      content: "Welcome to your interactive AI Mentor briefing room. I have analyzed your resume against the target role requirements and identified key preparation parameters. Ask me any strategic questions—from coding framework deep dives to soft-skill positioning or salary scenarios."
+    }
+  ]);
+  const [chatInput, setChatInput] = useState<string>("");
+  const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
 
   const tabs = [
     { id: "skill_gaps", label: "Skill Gaps", icon: <Brain className="w-4 h-4" /> },
@@ -41,6 +53,7 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
     { id: "salary_negotiation", label: "Salary Negotiation", icon: <Coins className="w-4 h-4" /> },
     { id: "outreach_pitch", label: "Outreach Pitch", icon: <Send className="w-4 h-4" /> },
     { id: "coach_strategy", label: "Coach Strategy", icon: <Compass className="w-4 h-4" /> },
+    { id: "ai_chat", label: "AI Mentor Chat", icon: <MessageSquare className="w-4 h-4" /> },
   ];
 
   const handleCopyText = (text: string, id: string) => {
@@ -68,6 +81,42 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
   const hrQuestions = data.salary_negotiation?.hr_questions ?? [];
   const negotiationTips = data.salary_negotiation?.negotiation_tips ?? [];
   const recommendedFrameworks = data.salary_negotiation?.recommended_answer_frameworks ?? [];
+
+  const handleSendChatMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim() || isChatLoading) return;
+
+    const userMessage = chatInput.trim();
+    const updatedMessages = [...chatMessages, { role: "user", content: userMessage } as ChatMessage];
+    setChatInput("");
+    setChatMessages(updatedMessages);
+    setIsChatLoading(true);
+
+    try {
+      const jobDesc = jobDescription || data.ats_analysis?.missing_keywords?.join(", ") || "Target Position";
+      const resumeText = data.resume_text || `Skill Gaps: ${skillGaps.join(", ")}`;
+      
+      const reply = await sendChatMessage(
+        userMessage,
+        chatMessages,
+        resumeText,
+        jobDesc
+      );
+
+      setChatMessages((prev) => [...prev, { role: "assistant", content: reply } as ChatMessage]);
+    } catch (err: any) {
+      console.error(err);
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `⚠️ System offline: ${err?.message || "Failed to communicate with AI Mentor. Please check backend configurations."}`
+        } as ChatMessage
+      ]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-white/45 dark:bg-white/5 backdrop-blur-xl rounded-2xl border border-slate-200/50 dark:border-white/10 overflow-hidden shadow-2xl">
@@ -448,6 +497,95 @@ export default function ResultsTabs({ data }: ResultsTabsProps) {
                 <div id="printable-coach-report" className="prose prose-slate dark:prose-invert max-w-none text-sm leading-relaxed text-slate-700 dark:text-slate-300 space-y-4 overflow-x-hidden md:text-base markdown-body">
                   <ReactMarkdown>{coachReport}</ReactMarkdown>
                 </div>
+              </div>
+            )}
+
+            {/* Tab 8: AI Mentor Chat (index 7) */}
+            {activeTab === 7 && (
+              <div className="flex flex-col h-[500px] max-h-[500px] border border-slate-200/40 dark:border-white/5 bg-slate-50/10 dark:bg-slate-950/20 rounded-2xl overflow-hidden">
+                {/* Chat Header Info */}
+                <div className="px-5 py-3 border-b border-slate-200/40 dark:border-white/5 bg-slate-100/30 dark:bg-white/5 flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-blue-500 animate-pulse" />
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                      Interactive Strategy Session
+                    </span>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 font-medium font-mono uppercase tracking-wider border border-emerald-500/20">
+                    Live Groq RAG Context
+                  </span>
+                </div>
+
+                {/* Messages Feed */}
+                <div className="flex-1 p-4 overflow-y-auto space-y-4 flex flex-col scrollbar-thin">
+                  {chatMessages.map((msg, i) => {
+                    const isAssistant = msg.role === "assistant";
+                    return (
+                      <div
+                        key={i}
+                        className={`flex items-start gap-2.5 max-w-[85%] ${
+                          isAssistant ? "self-start" : "self-end flex-row-reverse"
+                        }`}
+                      >
+                        {isAssistant && (
+                          <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 flex items-center justify-center shrink-0 shadow-sm border border-blue-200/20">
+                            <Brain className="w-4 h-4" />
+                          </div>
+                        )}
+                        <div
+                          className={`p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${
+                            isAssistant
+                              ? "bg-white dark:bg-white/5 border border-slate-200/40 dark:border-white/10 text-slate-800 dark:text-slate-200 rounded-tl-none"
+                              : "bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white rounded-tr-none"
+                          }`}
+                        >
+                          {isAssistant ? (
+                            <div className="prose prose-slate dark:prose-invert max-w-none text-sm leading-relaxed space-y-2 markdown-body">
+                              <ReactMarkdown>{msg.content}</ReactMarkdown>
+                            </div>
+                          ) : (
+                            <p className="whitespace-pre-wrap font-medium">{msg.content}</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Loading Bubble */}
+                  {isChatLoading && (
+                    <div className="flex items-start gap-2.5 max-w-[85%] self-start">
+                      <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200/20">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      </div>
+                      <div className="p-3.5 rounded-2xl bg-white dark:bg-white/5 border border-slate-200/40 dark:border-white/10 text-slate-500 dark:text-slate-400 rounded-tl-none flex items-center gap-2">
+                        <span className="text-xs font-medium animate-pulse">Mentor is reflecting on your dossier...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Input Panel */}
+                <form
+                  onSubmit={handleSendChatMessage}
+                  className="p-3.5 border-t border-slate-200/40 dark:border-white/5 bg-slate-100/30 dark:bg-white/5 flex gap-2.5 items-center shrink-0"
+                >
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    disabled={isChatLoading}
+                    placeholder="Ask about matching skills, specific gaps, interview tips..."
+                    className="flex-1 px-4 py-3 rounded-xl border border-slate-200/40 dark:border-white/10 bg-white/70 dark:bg-slate-950/70 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium transition-all"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isChatLoading || !chatInput.trim()}
+                    className="px-4.5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all flex items-center gap-1.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span className="hidden sm:inline text-xs font-bold uppercase tracking-wider">Ask Mentor</span>
+                  </button>
+                </form>
               </div>
             )}
           </motion.div>

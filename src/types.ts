@@ -38,6 +38,7 @@ export interface PrepKitResponse {
   salary_negotiation: SalaryNegotiation;
   coach_report: string;
   outreach_assets?: OutreachAssets;
+  resume_text?: string;
 }
 
 export interface ToastMessage {
