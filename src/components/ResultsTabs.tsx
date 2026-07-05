@@ -122,27 +122,21 @@ export default function ResultsTabs({ data, jobDescription = "" }: ResultsTabsPr
   return (
     <div className="flex flex-col h-full bg-white/45 dark:bg-white/5 backdrop-blur-xl rounded-2xl border border-slate-200/50 dark:border-white/10 overflow-hidden shadow-2xl">
       {/* Tab bar header */}
-      <div className="flex border-b border-slate-200/40 dark:border-white/10 bg-slate-50/30 dark:bg-slate-950/40 overflow-x-auto scrollbar-none shrink-0">
+      <div className="flex flex-wrap gap-1.5 p-2 border-b border-slate-200/40 dark:border-white/10 bg-slate-50/30 dark:bg-slate-950/40 shrink-0">
         {tabs.map((tab, idx) => {
           const isActive = activeTab === idx;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(idx)}
-              className={`relative flex items-center gap-2 px-5 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors shrink-0 whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer shrink-0 ${
                 isActive
-                  ? "border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 font-extrabold"
-                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                  ? "bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-extrabold border border-blue-500/20 shadow-sm"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 border border-transparent"
               }`}
             >
               {tab.icon}
               <span>{tab.label}</span>
-              {isActive && (
-                <motion.div
-                  layoutId="activeTabUnderline"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-blue-600 dark:bg-blue-400"
-                />
-              )}
             </button>
           );
         })}
