@@ -433,7 +433,7 @@ export default function App() {
                             </button>
                             <button
                               onClick={(e) => handleDeleteHistoryItem(e, item.id)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all duration-200 cursor-pointer shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all duration-200 cursor-pointer shrink-0 opacity-60 hover:opacity-100 focus:opacity-100"
                               title="Delete saved kit"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
