@@ -50,8 +50,8 @@ export async function savePrepKitToDB(
       throw error;
     }
   } else {
-    // Sandbox / Mock Storage Fallback
-    const mockHistory = JSON.parse(localStorage.getItem("ccc_mock_history") || "[]");
+    // Sandbox / Mock Storage Fallback (Session scoped to automatically clear when session ends)
+    const mockHistory = JSON.parse(sessionStorage.getItem("ccc_mock_history") || "[]");
     const newId = `mock_kit_${Date.now()}`;
     mockHistory.unshift({
       id: newId,
@@ -61,13 +61,13 @@ export async function savePrepKitToDB(
       prepKit,
       createdAt: new Date().toISOString(),
     });
-    localStorage.setItem("ccc_mock_history", JSON.stringify(mockHistory));
+    sessionStorage.setItem("ccc_mock_history", JSON.stringify(mockHistory));
     return newId;
   }
 }
 
 /**
- * Fetches all past saved Career Prep Kits for a specific user from Supabase.
+ * Saves a generated Career Prep Kit to Supabase (or LocalStorage in sandbox mode).
  */
 export async function fetchPrepKitsFromDB(userId: string): Promise<SavedPrepKit[]> {
   if (isRealSupabase && supabase) {
@@ -95,7 +95,7 @@ export async function fetchPrepKitsFromDB(userId: string): Promise<SavedPrepKit[
     }
   } else {
     // Sandbox / Mock Storage Fallback
-    const mockHistory = JSON.parse(localStorage.getItem("ccc_mock_history") || "[]");
+    const mockHistory = JSON.parse(sessionStorage.getItem("ccc_mock_history") || "[]");
     return mockHistory.filter((item: any) => item.userId === userId);
   }
 }
@@ -118,9 +118,9 @@ export async function deletePrepKitFromDB(id: string): Promise<void> {
     }
   } else {
     // Sandbox / Mock Storage Fallback
-    const mockHistory = JSON.parse(localStorage.getItem("ccc_mock_history") || "[]");
+    const mockHistory = JSON.parse(sessionStorage.getItem("ccc_mock_history") || "[]");
     const updatedHistory = mockHistory.filter((item: any) => item.id !== id);
-    localStorage.setItem("ccc_mock_history", JSON.stringify(updatedHistory));
+    sessionStorage.setItem("ccc_mock_history", JSON.stringify(updatedHistory));
   }
 }
 

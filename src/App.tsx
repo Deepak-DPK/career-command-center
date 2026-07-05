@@ -67,9 +67,9 @@ export default function App() {
     const isDark = localStorage.getItem("theme") !== "light";
     setDarkMode(isDark);
 
-    // Load persisted prep kit
-    const storedKit = localStorage.getItem("ccc_latest_kit");
-    const storedJob = localStorage.getItem("ccc_latest_job");
+    // Load persisted prep kit (session scoped to avoid cross-user or persistent leak)
+    const storedKit = sessionStorage.getItem("ccc_latest_kit");
+    const storedJob = sessionStorage.getItem("ccc_latest_job");
     if (storedKit) {
       try {
         setPrepKit(JSON.parse(storedKit));
@@ -133,6 +133,19 @@ export default function App() {
       loadHistory();
     } else {
       setHistory([]);
+      // Clear active states and cache on logout to avoid leaking data to different users or sandbox
+      setPrepKit(null);
+      setJobDescription("");
+      setSelectedFile(null);
+      
+      sessionStorage.removeItem("ccc_latest_kit");
+      sessionStorage.removeItem("ccc_latest_job");
+      sessionStorage.removeItem("ccc_mock_history");
+      sessionStorage.removeItem("ccc_sandbox_user");
+      
+      localStorage.removeItem("ccc_latest_kit");
+      localStorage.removeItem("ccc_latest_job");
+      localStorage.removeItem("ccc_mock_history");
     }
   }, [user]);
 
@@ -265,9 +278,9 @@ export default function App() {
       setIsSuccess(true);
       addToast("Analysis completed! Career Prep Kit successfully generated.", "success");
 
-      // Persist results in local state (local storage)
-      localStorage.setItem("ccc_latest_kit", JSON.stringify(result));
-      localStorage.setItem("ccc_latest_job", jobDescription);
+      // Persist results in local state (session storage to avoid persistent leak)
+      sessionStorage.setItem("ccc_latest_kit", JSON.stringify(result));
+      sessionStorage.setItem("ccc_latest_job", jobDescription);
 
       // Save to database/history if user logged in
       if (user) {
@@ -308,8 +321,8 @@ export default function App() {
     setPrepKit(item.prepKit);
     setJobDescription(item.jobDescription);
     addToast(`Loaded Strategy Package for ${item.resumeFilename}!`, "success");
-    localStorage.setItem("ccc_latest_kit", JSON.stringify(item.prepKit));
-    localStorage.setItem("ccc_latest_job", item.jobDescription);
+    sessionStorage.setItem("ccc_latest_kit", JSON.stringify(item.prepKit));
+    sessionStorage.setItem("ccc_latest_job", item.jobDescription);
   };
 
   const handleDeleteHistoryItem = async (e: React.MouseEvent, id: string) => {
@@ -508,6 +521,8 @@ export default function App() {
                               setPrepKit(null);
                               setSelectedFile(null);
                               setJobDescription("");
+                              sessionStorage.removeItem("ccc_latest_kit");
+                              sessionStorage.removeItem("ccc_latest_job");
                               localStorage.removeItem("ccc_latest_kit");
                               localStorage.removeItem("ccc_latest_job");
                               addToast("Preparation Command Center reset successfully.", "info");
