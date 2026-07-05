@@ -28,7 +28,8 @@ export async function savePrepKitToDB(
   resumeFilename: string,
   prepKit: PrepKitResponse
 ): Promise<string> {
-  if (isRealSupabase && supabase) {
+  const isMock = userId.startsWith("sandbox_") || userId.startsWith("mock_");
+  if (isRealSupabase && supabase && !isMock) {
     try {
       const { data, error } = await supabase
         .from("prep_kits")
@@ -70,7 +71,8 @@ export async function savePrepKitToDB(
  * Saves a generated Career Prep Kit to Supabase (or LocalStorage in sandbox mode).
  */
 export async function fetchPrepKitsFromDB(userId: string): Promise<SavedPrepKit[]> {
-  if (isRealSupabase && supabase) {
+  const isMock = userId.startsWith("sandbox_") || userId.startsWith("mock_");
+  if (isRealSupabase && supabase && !isMock) {
     try {
       const { data, error } = await supabase
         .from("prep_kits")
@@ -104,7 +106,8 @@ export async function fetchPrepKitsFromDB(userId: string): Promise<SavedPrepKit[
  * Deletes a saved Career Prep Kit from Supabase (or LocalStorage in sandbox mode).
  */
 export async function deletePrepKitFromDB(id: string): Promise<void> {
-  if (isRealSupabase && supabase) {
+  const isMock = id.startsWith("mock_") || id.startsWith("sandbox_");
+  if (isRealSupabase && supabase && !isMock) {
     try {
       const { error } = await supabase
         .from("prep_kits")
