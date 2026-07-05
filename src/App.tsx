@@ -535,7 +535,7 @@ export default function App() {
                       </div>
 
                       <div className="flex-1 flex flex-col">
-                        <ResultsTabs data={prepKit} jobDescription={jobDescription} isLoggedIn={!!user && !user.isMockUser} userId={user?.uid} />
+                        <ResultsTabs data={prepKit} jobDescription={jobDescription} isLoggedIn={!!user} userId={user?.uid} />
                       </div>
                     </motion.div>
                   ) : (
