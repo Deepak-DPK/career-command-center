@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Brain,
@@ -188,13 +188,13 @@ export default function App() {
         isMockUser: true,
       };
       setUser(mockUser);
-      localStorage.setItem("ccc_sandbox_user", JSON.stringify(mockUser));
+      sessionStorage.setItem("ccc_sandbox_user", JSON.stringify(mockUser));
       addToast("Launched Command Center in Sandbox Mode!", "success");
       setIsAuthenticating(false);
     }, 600);
   };
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     try {
       await signOutUser();
       setUser(null);
@@ -203,7 +203,39 @@ export default function App() {
     } catch (error) {
       addToast("Failed to clear auth session.", "error");
     }
-  };
+  }, []);
+
+  // Inactivity timeout: Auto-logout after 15 minutes of idle time
+  useEffect(() => {
+    if (!user) return;
+
+    const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes
+    let timeoutId: any;
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleSignOut();
+        addToast("Logged out automatically due to inactivity.", "info");
+      }, INACTIVITY_TIMEOUT);
+    };
+
+    // Track user interactions to reset the idle timer
+    const activityEvents = ["mousedown", "keydown", "scroll", "touchstart", "mousemove"];
+    
+    resetTimer();
+
+    activityEvents.forEach((event) => {
+      window.addEventListener(event, resetTimer);
+    });
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      activityEvents.forEach((event) => {
+        window.removeEventListener(event, resetTimer);
+      });
+    };
+  }, [user, handleSignOut]);
 
   // Cycle and load job samples
   const handleLoadSample = () => {
