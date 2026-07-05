@@ -1,54 +1,29 @@
-# 🚀 Career Command Center
+# Career Command Center — Frontend Dashboard
 
-An elite, full-stack career strategic coach dashboard. Automatically analyzes resume ATS mapping, detects skill/experience gaps, generates customized interview response scripts, objections prep sheets, and provides high-leverage compensation negotiation frameworks.
+This repository hosts the React + TypeScript frontend dashboard for the **Career Command Center (CCC)**, an AI-powered interview preparation suite.
 
-## Key Features
+The backend service that drives the Multi-Agent CrewAI pipeline, FastAPI endpoints, and Supabase RAG storage is hosted in the companion repository:
+- **Backend Repository**: [career-command-center-backend](https://github.com/Deepak-DPK/career-command-center-backend)
 
-- **ATS Mapping & Score Analyzer**: Scans resumes against job descriptions to extract missing keyword badges and metrics.
-- **Competency Diagnostic**: Generates tailored questions targeting discovered experience gaps.
-- **Objection Response Strategies**: Prepares candidates for tough recruiter pushbacks.
-- **Compensation Negotiator**: High-leverage scripts, typical HR interview queries, and redirect frameworks.
-- **Supabase Cloud Sync**: Saves and loads previous preparation kits across logins.
-- **Google Auth Integration**: Fast, secure access with session persistence.
+---
 
-## Tech Stack
+## 🌟 Project Purpose & Core Features
 
-- **Frontend**: React, TypeScript, Tailwind CSS, Lucide icons, Motion
-- **Backend**: Express, Multer, Node.js, Google GenAI SDK (Gemini)
-- **Database & Auth**: Supabase DB, Firebase Authentication
+This dashboard provides candidates with an interactive panel to analyze their resumes against target job descriptions. The core interface sections include:
 
-## Getting Started
+- **ATS Score & Matching**: Lists missing keywords and suggests bullet rewrites to optimize automated scanning.
+- **Skill Gaps Diagnostic**: Pinpoints domain, technical, and soft skill gaps.
+- **Interview Simulator**: Provides core, situational, and behavioral STAR questions.
+- **Objections Strategy**: Anticipates and resolves tough pushback scenarios.
+- **Salary Negotiation Scripts**: Formulates compensation talking points and tips.
+- **Outreach Drafts**: Automatically writes cold emails and LinkedIn pitches.
+- **Interactive AI Career Mentor**: Features a RAG-enabled chat to query strategy.
 
-### Prerequisites
+---
 
-- Node.js (v18+)
-- npm
+## 💻 Frontend Tech Stack
 
-### Installation & Run
-
-1. Clone the repository and install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Configure environment variables. Create a `.env` file in the root directory based on `.env.example`:
-   ```env
-   # API Keys
-   GEMINI_API_KEY="your-gemini-api-key"
-   
-   # Firebase Auth
-   VITE_FIREBASE_API_KEY="your-api-key"
-   VITE_FIREBASE_AUTH_DOMAIN="your-auth-domain"
-   VITE_FIREBASE_PROJECT_ID="your-project-id"
-
-   # Supabase DB
-   VITE_SUPABASE_URL="your-supabase-url"
-   VITE_SUPABASE_ANON_KEY="your-anon-key"
-   ```
-
-3. Launch the local development server:
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+- **React & TypeScript**: Single-page application logic.
+- **TailwindCSS**: Premium dark-themed SaaS card layout with glows and custom animations.
+- **Framer Motion**: Smooth tab transitions and content fade-ins.
+- **Firebase Auth & Supabase Client**: Integrated session management and RAG database synchronization.
