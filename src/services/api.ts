@@ -69,7 +69,8 @@ export async function sendChatMessage(
   history: ChatMessage[],
   resumeText: string,
   jobDescription: string,
-  resumeId?: string
+  resumeId?: string,
+  userId?: string
 ): Promise<string> {
   try {
     const response = await apiInstance.post<{ reply: string }>("/chat", {
@@ -78,6 +79,7 @@ export async function sendChatMessage(
       resume_text: resumeText,
       job_description: jobDescription,
       resume_id: resumeId,
+      user_id: userId,
     });
     return response.data.reply;
   } catch (error: any) {

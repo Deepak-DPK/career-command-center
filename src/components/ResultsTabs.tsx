@@ -33,9 +33,10 @@ interface ResultsTabsProps {
   data: PrepKitResponse;
   jobDescription?: string;
   isLoggedIn?: boolean;
+  userId?: string;
 }
 
-export default function ResultsTabs({ data, jobDescription = "", isLoggedIn = false }: ResultsTabsProps) {
+export default function ResultsTabs({ data, jobDescription = "", isLoggedIn = false, userId = "" }: ResultsTabsProps) {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -119,7 +120,8 @@ export default function ResultsTabs({ data, jobDescription = "", isLoggedIn = fa
         chatMessages,
         resumeText,
         jobDesc,
-        data.resume_id ?? undefined
+        data.resume_id ?? undefined,
+        userId
       );
 
       setChatMessages((prev) => [...prev, { role: "assistant", content: reply } as ChatMessage]);
